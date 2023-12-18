@@ -51,6 +51,7 @@ def get_callbacks(app):
         cusip_df["maturity_date"] = cusip_df["maturity_date"].str.split(" ").str[0]
         num_secs = len(secs)
         cusip_df["weight"] = 1 / num_secs
+        cusip_df["weight"] = cusip_df["weight"].round(4)
 
         return cusip_df.to_dict("records")
 
@@ -72,9 +73,7 @@ def get_callbacks(app):
     )
     def create_yield_chart(port_data, table_data):
         sec_df = calcs.convert_to_port_df(port_data)
-
         port_df = calcs.create_portfolio(sec_df, table_data, "yield_close")
-
         traces = []
         for sec in port_df.columns:
             traces.append(
@@ -82,13 +81,13 @@ def get_callbacks(app):
                     x=port_df.index,
                     y=port_df[sec],
                     # text=df_by_continent['country'],
-                    opacity=0.7 if sec != "Portfolio" else 1,
+                    opacity=0.5 if sec != "Portfolio" else 1,
                     mode="lines",
                     name=sec,
                 )
             )
         layout = Layout(
-            title="Portfolio and Bond Yields",
+            title="Portfolio and Constituent Yields",
             yaxis={"title": "Yield"},
             hovermode="closest",
             legend=dict(x=0, y=1),
@@ -97,5 +96,93 @@ def get_callbacks(app):
             results = {"data": traces, "layout": layout}
         else:
             results = {"data": [], "layout": layout}
-
         return results
+
+    @app.callback(
+        Output(component_id="yield-change-graph", component_property="figure"),
+        Input("hidden-port-data", "children"),
+        Input("constituents-table", "data"),
+    )
+    def create_yield_change_chart(port_data, table_data):
+        sec_df = calcs.convert_to_port_df(port_data)
+        delta_df = calcs.create_yield_change_df(sec_df, table_data)
+        traces = [
+            Scatter(
+                x=delta_df.index,
+                y=delta_df["Portfolio"],
+                # text=df_by_continent['country'],
+                opacity=1,
+                mode="lines",
+                name="Portfolio",
+            )]
+        layout = Layout(
+            title="Portfolio Daily Yield Change",
+            yaxis={"title": "Yield Delta"},
+            hovermode="closest",
+            legend=dict(x=0, y=1),
+        )
+        if calcs.check_weights(table_data):
+            results = {"data": traces, "layout": layout}
+        else:
+            results = {"data": [], "layout": layout}
+        return results
+
+
+    @app.callback(
+        Output(component_id="duration-graph", component_property="figure"),
+        Input("hidden-dv01-data", "children"),
+        Input("constituents-table", "data"),
+    )
+    def create_duration_chart(port_data, table_data):
+        sec_df = calcs.convert_to_port_df(port_data, "dv01")
+        duration_df = calcs.create_portfolio(sec_df, table_data, "dv01")
+        traces = []
+        for sec in duration_df.columns:
+            traces.append(
+                Scatter(
+                    x=duration_df.index,
+                    y=duration_df[sec],
+                    # text=df_by_continent['country'],
+                    opacity=0.5 if sec != "Portfolio" else 1,
+                    mode="lines",
+                    name=sec,
+                ))
+        layout = Layout(
+            title="Portfolio and Constituent Duration",
+            yaxis={"title": "Duration"},
+            hovermode="closest",
+            legend=dict(x=0, y=1),
+        )
+        if calcs.check_weights(table_data):
+            results = {"data": traces, "layout": layout}
+        else:
+            results = {"data": [], "layout": layout}
+        return results
+
+
+    @app.callback(
+        Output(component_id="sim-var", component_property="children"),
+        Input("hidden-port-data", "children"),
+        Input("constituents-table", "data"),
+        Input("var-slider", "value")
+    )
+    def create_sim_value_at_risk(port_data, table_data, confidence_level):
+        sec_df = calcs.convert_to_port_df(port_data)
+        var = calcs.value_at_risk_historical_simulation(sec_df, table_data, confidence_level/100)
+        if calcs.check_weights(table_data):
+            return f"Historical Simulation VaR: {var:.2%}"
+        return "Historical Simulation VaR:"
+
+
+    @app.callback(
+        Output(component_id="cov-var", component_property="children"),
+        Input("hidden-port-data", "children"),
+        Input("constituents-table", "data"),
+        Input("var-slider", "value")
+    )
+    def create_var_cov_value_at_risk(port_data, table_data, confidence_level):
+        sec_df = calcs.convert_to_port_df(port_data)
+        var = calcs.value_at_risk_var_covar(sec_df, table_data, confidence_level/100)
+        if calcs.check_weights(table_data):
+            return f"Variance-Covariance VaR: {var:.2%}"
+        return "Variance-Covariance VaR:"

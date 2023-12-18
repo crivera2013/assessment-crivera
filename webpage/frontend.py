@@ -47,21 +47,32 @@ def load_html() -> html.Div:
     return html.Div(
         [
             html.Div(
-                [
-                    dcc.Graph(
-                        id="yield-graph",
-                        config={
-                            "displayModeBar": False,
-                            "scrollZoom": True,
-                        },
-                    ),
-                    dcc.Graph(
-                        id="yield-change-graph",
-                        config={
-                            "displayModeBar": False,
-                            "scrollZoom": True,
-                        },
-                    ),
+                [dcc.Tabs(id="graph-tabs", children=[
+                    dcc.Tab(label="Yield Chart", children=[
+                        dcc.Graph(
+                            id="yield-graph",
+                            config={
+                                "displayModeBar": False,
+                                "scrollZoom": True,
+                            },
+                    )]),
+                    dcc.Tab(label="Yield Delta Chart", children=[
+                        dcc.Graph(
+                            id="yield-change-graph",
+                            config={
+                                "displayModeBar": False,
+                                "scrollZoom": True,
+                            },
+                    )]),
+                    dcc.Tab(label="Duration Chart", children=[
+                        dcc.Graph(
+                            id="duration-graph",
+                            config={
+                                "displayModeBar": False,
+                                "scrollZoom": True,
+                            },
+                    )])
+                ])
                 ],
                 style={
                     "textAlign": "center",

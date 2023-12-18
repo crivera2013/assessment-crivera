@@ -45,7 +45,7 @@ def value_at_risk_historical_simulation(
 ) -> float:
     """compute the historical simulation VaR of the portfolio"""
     port_df = create_portfolio(yield_df, table_data)
-    returns = port_df["portfolio"].pct_change()
+    returns = port_df["Portfolio"].pct_change()
     value_at_risk = returns.quantile(1 - confidence_level)
     return value_at_risk
 
@@ -55,7 +55,7 @@ def value_at_risk_var_covar(
 ) -> float:
     """compute the variance-covariance VaR of the portfolio"""
     port_df = create_portfolio(yield_df, table_data)
-    returns = port_df["portfolio"].pct_change()
+    returns = port_df["Portfolio"].pct_change()
     value_at_risk = norm.ppf(1 - confidence_level, returns.mean(), returns.std())
     return value_at_risk
 
@@ -64,7 +64,7 @@ def check_weights(table_data: list[dict]) -> bool:
     "checks if the user inputted weights sum up to 1"
     table_df = pd.DataFrame(table_data)
     table_df["weight"] = table_df["weight"].astype(float)
-    if np.isclose(table_df["weight"].sum(), 1.0):
+    if np.isclose(table_df["weight"].sum(), 1.0, atol=1e-04):
         return True
     return False
 
