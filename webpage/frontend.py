@@ -1,5 +1,6 @@
 """
-
+This file contains all the code for generating the
+HTML and Javascript for the Bond Portfolio tab
 """
 
 from datetime import date

@@ -6,7 +6,7 @@ from webpage import callbacks, frontend
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
-README = open("README.md", "r").read()
+README = open("README.md", "r").read()  # pylint: disable=unspecified-encoding
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server

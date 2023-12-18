@@ -20,7 +20,7 @@ def create_portfolio(
     port_df = pd.pivot_table(
         input_df, index="trade_date", columns="cusip", values=column
     ).ffill()
-    weights = pd.DataFrame(table_data).set_index("cusip")
+    weights: pd.DataFrame = pd.DataFrame(table_data).set_index("cusip")
     weights["weight"] = weights["weight"].astype(float)
 
     weights_df = port_df.copy()

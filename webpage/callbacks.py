@@ -1,3 +1,8 @@
+"""
+This file contains code for how data is retrieved and rendered
+when user interacts with the HTML elements on the Bond Portfolio tab
+"""
+
 import json
 
 import pandas as pd
