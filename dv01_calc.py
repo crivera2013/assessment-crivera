@@ -53,7 +53,7 @@ def calc_dv01(
 def main():
     """calculate the dv01_info table and insert it into the SQL database"""
 
-    yield_df = pd.read_sql("tick_history", DATABASE_URL).set_index("id_row")
+    yield_df = pd.read_sql("tick_history", DATABASE_URL).set_index("id")
     coupon_df = pd.read_sql("cusip_info", DATABASE_URL).set_index("cusip")
 
     yield_df["yield_close"] = yield_df["yield_close"] / 100

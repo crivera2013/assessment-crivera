@@ -1,12 +1,25 @@
-from datetime import date
-import pandas as pd
-from dash import dcc, html
-from dash.dash_table import DataTable
+"""
 
-styling = {  # 'textAlign':'center',
+"""
+
+from datetime import date
+
+import pandas as pd
+from dash import dcc, html  # pylint: disable=import-error
+from dash.dash_table import DataTable  # pylint: disable=import-error
+
+
+styling = {
     "font-family": "Georgia",
     "font-size": "18px",
     "padding": "10px",
+    "text-align": "center",
+}
+
+styling_table = {
+    "font-family": "Georgia",
+    "font-size": "12px",
+    "padding": "4px",
     "text-align": "center",
 }
 
@@ -82,12 +95,35 @@ def load_html() -> html.Div:
                     ),
                     html.Label("VaR Confidence Interval %", style=styling),
                     dcc.Slider(min=90, max=99, step=1, value=95, id="var-slider"),
-                    html.Label("VaR Type"),
-                    dcc.RadioItems(
-                        ["Historical Simulation", "Variance-Covariance"],
-                        inline=True,
-                        id="var-type",
+                    html.Label("VaR Type", style=styling),
+                    html.Label(
+                        "Historical Simulation VaR:", style=styling, id="sim-var"
                     ),
+                    html.Label("Variance-Covariance VaR:", style=styling, id="cov-var"),
+                    DataTable(
+                        id="constituents-table",
+                        columns=(
+                            [{"id": "weight", "name": "weight", "editable": True}] +
+                            [
+                                {"id": p, "name": p.replace("_", " "), "editable": False}
+                                for p in [
+                                    "cusip",
+                                    "issuer",
+                                    "coupon",
+                                    "maturity_date",
+                                    "payments_per_year",]
+                            ]
+                        ),
+
+                        style_cell=styling_table,
+                        style_cell_conditional=[
+                            {
+                                "if": {"column_id": "weight"},
+                                "backgroundColor": "lightgreen",
+                            }
+                        ],
+                    ),
+                    html.Label("Weight column is editable: input number and press enter to re-weight", style=styling, id="weight-error"),
                 ],
                 style={
                     "textAlign": "center",
