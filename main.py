@@ -2,12 +2,11 @@
 
 from dash import Dash, dcc, html  # pylint: disable=import-error
 
-from webpage import callbacks
-from webpage import frontend
+from webpage import callbacks, frontend
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
-
+README = open("README.md", "r").read()
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
@@ -26,18 +25,27 @@ app.layout = html.Div(
         ),
         html.Div(id="hidden-port-data", style={"display": "none"}),
         html.Div(id="hidden-dv01-data", style={"display": "none"}),
-        html.Div(id="hidden-weights-data",style={"display": "none"}),
-
+        html.Div(id="hidden-weights-data", style={"display": "none"}),
         dcc.Tabs(
             id="tabs",
             children=[
                 dcc.Tab(
-                    label="Bond Portfolio",
+                    label="Interactive Bond Portfolio",
                     children=[frontend.load_html()],
                 ),
                 dcc.Tab(
-                    label="README",
-                    children=[dcc.Markdown("""## To Whom it May Concern""")],
+                    label="README Writeup",
+                    children=[
+                        dcc.Markdown(
+                            f"""{README}""",
+                            style={
+                                "font-family": "Georgia",
+                                "font-size": "16px",
+                                "padding": "4px",
+                                "text-align": "left",
+                            },
+                        )
+                    ],
                 ),
             ],
         ),

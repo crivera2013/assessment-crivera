@@ -4,18 +4,19 @@ import pandas as pd
 from dash import Input, Output
 from plotly.graph_objs import Layout, Scatter
 
-from webpage import calculations as calcs
 from database_creation import DATABASE_URL
+from webpage import calculations as calcs
 
 
 def get_callbacks(app):
     """wrapper functioon to assign all the callbacks for the Bond Portfolio tab
     to the app object"""
+
     @app.callback(
         Output("hidden-port-data", "children"),
         Input("date-range", "start_date"),
         Input("date-range", "end_date"),
-        Input(component_id="sec-picker", component_property="value")
+        Input(component_id="sec-picker", component_property="value"),
     )
     def query_yield_data(start_date: str, end_date: str, secs: list[str]) -> dict:
         """Callback function to query the SQL database for the yield data
@@ -30,7 +31,7 @@ def get_callbacks(app):
         Output("hidden-dv01-data", "children"),
         Input("date-range", "start_date"),
         Input("date-range", "end_date"),
-        Input(component_id="sec-picker", component_property="value")
+        Input(component_id="sec-picker", component_property="value"),
     )
     def query_dv01_data(start_date: str, end_date: str, secs: list[str]) -> dict:
         """Callback function to query the SQL database for the dv01 data
@@ -42,7 +43,7 @@ def get_callbacks(app):
 
     @app.callback(
         Output("constituents-table", "data"),
-        Input(component_id="sec-picker", component_property="value")
+        Input(component_id="sec-picker", component_property="value"),
     )
     def create_cusip_table(secs: list[str]) -> dict:
         """Callback function to create the constituent table"""
@@ -114,7 +115,8 @@ def get_callbacks(app):
                 opacity=1,
                 mode="lines",
                 name="Portfolio",
-            )]
+            )
+        ]
         layout = Layout(
             title="Portfolio Daily Yield Change",
             yaxis={"title": "Yield Delta"},
@@ -126,7 +128,6 @@ def get_callbacks(app):
         else:
             results = {"data": [], "layout": layout}
         return results
-
 
     @app.callback(
         Output(component_id="duration-graph", component_property="figure"),
@@ -146,7 +147,8 @@ def get_callbacks(app):
                     opacity=0.5 if sec != "Portfolio" else 1,
                     mode="lines",
                     name=sec,
-                ))
+                )
+            )
         layout = Layout(
             title="Portfolio and Constituent Duration",
             yaxis={"title": "Duration"},
@@ -159,30 +161,30 @@ def get_callbacks(app):
             results = {"data": [], "layout": layout}
         return results
 
-
     @app.callback(
         Output(component_id="sim-var", component_property="children"),
         Input("hidden-port-data", "children"),
         Input("constituents-table", "data"),
-        Input("var-slider", "value")
+        Input("var-slider", "value"),
     )
     def create_sim_value_at_risk(port_data, table_data, confidence_level):
         sec_df = calcs.convert_to_port_df(port_data)
-        var = calcs.value_at_risk_historical_simulation(sec_df, table_data, confidence_level/100)
+        var = calcs.value_at_risk_historical_simulation(
+            sec_df, table_data, confidence_level / 100
+        )
         if calcs.check_weights(table_data):
             return f"Historical Simulation VaR: {var:.2%}"
         return "Historical Simulation VaR:"
-
 
     @app.callback(
         Output(component_id="cov-var", component_property="children"),
         Input("hidden-port-data", "children"),
         Input("constituents-table", "data"),
-        Input("var-slider", "value")
+        Input("var-slider", "value"),
     )
     def create_var_cov_value_at_risk(port_data, table_data, confidence_level):
         sec_df = calcs.convert_to_port_df(port_data)
-        var = calcs.value_at_risk_var_covar(sec_df, table_data, confidence_level/100)
+        var = calcs.value_at_risk_var_covar(sec_df, table_data, confidence_level / 100)
         if calcs.check_weights(table_data):
             return f"Variance-Covariance VaR: {var:.2%}"
         return "Variance-Covariance VaR:"

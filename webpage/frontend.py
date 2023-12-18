@@ -8,7 +8,6 @@ import pandas as pd
 from dash import dcc, html  # pylint: disable=import-error
 from dash.dash_table import DataTable  # pylint: disable=import-error
 
-
 styling = {
     "font-family": "Georgia",
     "font-size": "18px",
@@ -47,32 +46,48 @@ def load_html() -> html.Div:
     return html.Div(
         [
             html.Div(
-                [dcc.Tabs(id="graph-tabs", children=[
-                    dcc.Tab(label="Yield Chart", children=[
-                        dcc.Graph(
-                            id="yield-graph",
-                            config={
-                                "displayModeBar": False,
-                                "scrollZoom": True,
-                            },
-                    )]),
-                    dcc.Tab(label="Yield Delta Chart", children=[
-                        dcc.Graph(
-                            id="yield-change-graph",
-                            config={
-                                "displayModeBar": False,
-                                "scrollZoom": True,
-                            },
-                    )]),
-                    dcc.Tab(label="Duration Chart", children=[
-                        dcc.Graph(
-                            id="duration-graph",
-                            config={
-                                "displayModeBar": False,
-                                "scrollZoom": True,
-                            },
-                    )])
-                ])
+                [
+                    dcc.Tabs(
+                        id="graph-tabs",
+                        children=[
+                            dcc.Tab(
+                                label="Yield Chart",
+                                children=[
+                                    dcc.Graph(
+                                        id="yield-graph",
+                                        config={
+                                            "displayModeBar": False,
+                                            "scrollZoom": True,
+                                        },
+                                    )
+                                ],
+                            ),
+                            dcc.Tab(
+                                label="Yield Delta Chart",
+                                children=[
+                                    dcc.Graph(
+                                        id="yield-change-graph",
+                                        config={
+                                            "displayModeBar": False,
+                                            "scrollZoom": True,
+                                        },
+                                    )
+                                ],
+                            ),
+                            dcc.Tab(
+                                label="Duration Chart",
+                                children=[
+                                    dcc.Graph(
+                                        id="duration-graph",
+                                        config={
+                                            "displayModeBar": False,
+                                            "scrollZoom": True,
+                                        },
+                                    )
+                                ],
+                            ),
+                        ],
+                    )
                 ],
                 style={
                     "textAlign": "center",
@@ -114,18 +129,22 @@ def load_html() -> html.Div:
                     DataTable(
                         id="constituents-table",
                         columns=(
-                            [{"id": "weight", "name": "weight", "editable": True}] +
-                            [
-                                {"id": p, "name": p.replace("_", " "), "editable": False}
+                            [{"id": "weight", "name": "weight", "editable": True}]
+                            + [
+                                {
+                                    "id": p,
+                                    "name": p.replace("_", " "),
+                                    "editable": False,
+                                }
                                 for p in [
                                     "cusip",
                                     "issuer",
                                     "coupon",
                                     "maturity_date",
-                                    "payments_per_year",]
+                                    "payments_per_year",
+                                ]
                             ]
                         ),
-
                         style_cell=styling_table,
                         style_cell_conditional=[
                             {
@@ -134,7 +153,11 @@ def load_html() -> html.Div:
                             }
                         ],
                     ),
-                    html.Label("Weight column is editable: input number and press enter to re-weight", style=styling, id="weight-error"),
+                    html.Label(
+                        "Weight column is editable: input number and press enter to re-weight",
+                        style=styling,
+                        id="weight-error",
+                    ),
                 ],
                 style={
                     "textAlign": "center",

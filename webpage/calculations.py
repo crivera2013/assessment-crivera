@@ -6,6 +6,7 @@ This module contains functions for:
 - computing variance-covariance VaR
 """
 import json
+
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
@@ -31,7 +32,9 @@ def create_portfolio(
     return port_df
 
 
-def create_yield_change_df(yield_df: pd.DataFrame, table_data: list[dict]) -> pd.DataFrame:
+def create_yield_change_df(
+    yield_df: pd.DataFrame, table_data: list[dict]
+) -> pd.DataFrame:
     """compute the historical portfolio yield change"""
 
     port_df = create_portfolio(yield_df, table_data, "yield_close")
@@ -67,6 +70,7 @@ def check_weights(table_data: list[dict]) -> bool:
     if np.isclose(table_df["weight"].sum(), 1.0, atol=1e-04):
         return True
     return False
+
 
 def convert_to_port_df(port_data: str, column: str = "yield_close") -> pd.DataFrame:
     """converts json string to pandas dataframe"""
