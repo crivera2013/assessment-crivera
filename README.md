@@ -69,7 +69,7 @@ Due to a lack of time and access to the relevant data all bonds in this app are 
 - no FX data
 - coupon payments follow a fixed, standard schedule
 
-The 5 bonds chosen were strictly US treasuries or American corporate bonds because of their simplicity.
+The 5 bonds chosen were strictly American corporate bonds because of their simplicity.
 
 Because of time constraints, I had to choose between creating and launching an interactive web application or less reproducible code that could handle more complicated Fixed Income and derivatives products.
 
