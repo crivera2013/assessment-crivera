@@ -40,12 +40,8 @@ def calc_dv01(
     if the yield is changed +/-0.01.  The slope of the line is the duration.
     """
     price = -1 * npf.pv(rate=ytm, nper=num_payments, pmt=coupon, fv=fv)
-    lower = -1 * npf.pv(
-        rate=ytm - yield_change, nper=num_payments, pmt=coupon, fv=fv
-    )
-    higher = -1 * npf.pv(
-        rate=ytm + yield_change, nper=num_payments, pmt=coupon, fv=fv
-    )
+    lower = -1 * npf.pv(rate=ytm - yield_change, nper=num_payments, pmt=coupon, fv=fv)
+    higher = -1 * npf.pv(rate=ytm + yield_change, nper=num_payments, pmt=coupon, fv=fv)
     dv01 = (lower - higher) / (2 * price * yield_change)
     return dv01
 
