@@ -1,19 +1,31 @@
 """
 This file contains code for how data is retrieved and rendered
 when user interacts with the HTML elements on the Bond Portfolio tab
+
+The way Dash/Callabacks works is that you declare a function and then provide a callback decorator
+that informs Dash what functions to envoke when an HTML element is modified/accessed by a user
+
+app.callback(
+    Output("html element that receives output of function", "property of html element that will be overriden by output")
+    Input("html element that triggers function". "valueA sent as input to the function"),
+    Input("a different html element that can also trigger function when accessed", "valueB sent as input to the function")
+)
+def some func(valueA, valueB):
+    return data_to_output_html_element
+
 """
 
 import json
 
 import pandas as pd
-from dash import Input, Output
+from dash import Input, Output, Dash
 from plotly.graph_objs import Layout, Scatter
 
 from database_creation import DATABASE_URL
 from webpage import calculations as calcs
 
-
-def get_callbacks(app):
+# this is all wrapped in a function so that it can be imported into main.py
+def get_callbacks(app: Dash):
     """wrapper functioon to assign all the callbacks for the Bond Portfolio tab
     to the app object"""
 
@@ -92,7 +104,7 @@ def get_callbacks(app):
         Input("hidden-port-data", "children"),
         Input("constituents-table", "data"),
     )
-    def create_yield_chart(port_data, table_data):
+    def create_yield_chart(port_data: dict, table_data: dict) -> dict:
         sec_df = calcs.convert_to_port_df(port_data)
         port_df = calcs.create_portfolio(sec_df, table_data, "ytm")
         traces = []
@@ -125,7 +137,7 @@ def get_callbacks(app):
         Input("hidden-price-data", "children"),
         Input("constituents-table", "data"),
     )
-    def create_price_chart(port_data, table_data):
+    def create_price_chart(port_data: dict, table_data: dict) -> dict:
         sec_df = calcs.convert_to_port_df(port_data, "close_price")
         port_df = calcs.create_portfolio(sec_df, table_data, "close_price")
         print(port_df.head())
@@ -159,7 +171,7 @@ def get_callbacks(app):
         Input("hidden-port-data", "children"),
         Input("constituents-table", "data"),
     )
-    def create_yield_change_chart(port_data, table_data):
+    def create_yield_change_chart(port_data: dict, table_data: dict) -> dict:
         sec_df = calcs.convert_to_port_df(port_data)
         delta_df = calcs.create_yield_change_df(sec_df, table_data)
         traces = [
@@ -189,7 +201,7 @@ def get_callbacks(app):
         Input("hidden-dv01-data", "children"),
         Input("constituents-table", "data"),
     )
-    def create_duration_chart(port_data, table_data):
+    def create_duration_chart(port_data: dict, table_data: dict) -> dict:
         sec_df = calcs.convert_to_port_df(port_data, "dv01")
         duration_df = calcs.create_portfolio(sec_df, table_data, "dv01")
         traces = []
@@ -222,7 +234,7 @@ def get_callbacks(app):
         Input("constituents-table", "data"),
         Input("var-slider", "value"),
     )
-    def create_sim_value_at_risk(port_data, table_data, confidence_level):
+    def create_sim_value_at_risk(port_data: dict, table_data: dict) -> dict:
         sec_df = calcs.convert_to_port_df(port_data)
         var = calcs.value_at_risk_historical_simulation(
             sec_df, table_data, confidence_level / 100
