@@ -36,6 +36,7 @@ class TickHistory(Base):
     id = Column(Integer, primary_key=True)
     cusip = Column(String(50), unique=False, nullable=False)
     ytm = Column(Float, unique=False, nullable=False)
+    close_price = Column(Float, unique=False, nullable=False)
     trade_date = Column(DateTime, default=datetime.datetime.utcnow)
 
 

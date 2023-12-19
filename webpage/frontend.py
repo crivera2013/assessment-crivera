@@ -76,10 +76,22 @@ def load_html() -> html.Div:
                                 ],
                             ),
                             dcc.Tab(
-                                label="Duration Chart",
+                                label="DV01 Chart",
                                 children=[
                                     dcc.Graph(
                                         id="duration-graph",
+                                        config={
+                                            "displayModeBar": False,
+                                            "scrollZoom": True,
+                                        },
+                                    )
+                                ],
+                            ),
+                            dcc.Tab(
+                                label="Price Chart",
+                                children=[
+                                    dcc.Graph(
+                                        id="price-graph",
                                         config={
                                             "displayModeBar": False,
                                             "scrollZoom": True,

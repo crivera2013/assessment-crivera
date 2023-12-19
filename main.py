@@ -25,7 +25,7 @@ app.layout = html.Div(
         ),
         html.Div(id="hidden-port-data", style={"display": "none"}),
         html.Div(id="hidden-dv01-data", style={"display": "none"}),
-        html.Div(id="hidden-weights-data", style={"display": "none"}),
+        html.Div(id="hidden-price-data", style={"display": "none"}),
         dcc.Tabs(
             id="tabs",
             children=[

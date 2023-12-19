@@ -47,6 +47,21 @@ def get_callbacks(app):
         return json.dumps(dv01_df)
 
     @app.callback(
+        Output("hidden-price-data", "children"),
+        Input("date-range", "start_date"),
+        Input("date-range", "end_date"),
+        Input(component_id="sec-picker", component_property="value"),
+    )
+    def query_price_data(start_date: str, end_date: str, secs: list[str]) -> dict:
+        """Callback function to query the SQL database for the yield data
+        and return it as a json string"""
+        query = f"""select cusip, close_price, trade_date from tick_history where
+        trade_date >= '{start_date}' and trade_date <= '{end_date}' and cusip in {tuple(secs)}"""
+        price_df = pd.read_sql(query, DATABASE_URL).to_dict("records")
+        return json.dumps(price_df)
+
+
+    @app.callback(
         Output("constituents-table", "data"),
         Input(component_id="sec-picker", component_property="value"),
     )
@@ -103,6 +118,41 @@ def get_callbacks(app):
         else:
             results = {"data": [], "layout": layout}
         return results
+
+
+    @app.callback(
+        Output(component_id="price-graph", component_property="figure"),
+        Input("hidden-price-data", "children"),
+        Input("constituents-table", "data"),
+    )
+    def create_price_chart(port_data, table_data):
+        sec_df = calcs.convert_to_port_df(port_data, "close_price")
+        port_df = calcs.create_portfolio(sec_df, table_data, "close_price")
+        print(port_df.head())
+        traces = []
+        for sec in port_df.columns:
+            traces.append(
+                Scatter(
+                    x=port_df.index,
+                    y=port_df[sec],
+                    # text=df_by_continent['country'],
+                    opacity=0.5 if sec != "Portfolio" else 1,
+                    mode="lines",
+                    name=sec,
+                )
+            )
+        layout = Layout(
+            title="Portfolio and Constituent Prices",
+            yaxis={"title": "Price ($)"},
+            hovermode="closest",
+            legend=dict(x=0, y=1),
+        )
+        if calcs.check_weights(table_data):
+            results = {"data": traces, "layout": layout}
+        else:
+            results = {"data": [], "layout": layout}
+        return results
+
 
     @app.callback(
         Output(component_id="yield-change-graph", component_property="figure"),
