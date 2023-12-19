@@ -35,8 +35,7 @@ class TickHistory(Base):
     __tablename__ = "tick_history"
     id = Column(Integer, primary_key=True)
     cusip = Column(String(50), unique=False, nullable=False)
-    yield_close = Column(Float, unique=False, nullable=False)
-    price_close = Column(Float, unique=False, nullable=False)
+    ytm = Column(Float, unique=False, nullable=False)
     trade_date = Column(DateTime, default=datetime.datetime.utcnow)
 
 
@@ -50,7 +49,7 @@ class CusipInfo(Base):
     cusip = Column(String(50), primary_key=True, unique=True, nullable=False)
     issuer = Column(String(50), unique=False, nullable=False)
     maturity_date = Column(DateTime, default=datetime.datetime.utcnow)
-    payments_per_year = Column(Integer, unique=False, nullable=False)
+    coupon_freq = Column(Integer, unique=False, nullable=False)
     coupon = Column(Float, unique=False, nullable=False)
 
 
@@ -82,8 +81,8 @@ def load_refinitiv_data() -> [pd.DataFrame, pd.DataFrame]:
     """Refinitiv Datascope jobs are downloaded as csv files.
     This loads the csv files as pandas dataframes in preparation for SQL ingestion"""
 
-    tick_history = pd.read_excel(
-        "refinitiv_data/tick_history.xlsx", parse_dates=["trade_date"]
+    tick_history = pd.read_csv(
+        "refinitiv_data/tick_history.csv", parse_dates=["trade_date"]
     )
     tick_history.index.name = "id"
     cusip_info = pd.read_csv(

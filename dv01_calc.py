@@ -29,7 +29,7 @@ def num_payments_left(date: pd.Timestamp, mat_date: pd.Timestamp, freq: int = 1)
 
 
 def calc_dv01(
-    yield_close: float,
+    ytm: float,
     coupon: float,
     num_payments: int,
     yield_change: float = 0.01,
@@ -39,12 +39,12 @@ def calc_dv01(
     DV01 is thus calculated by observing the change in present value of a bond
     if the yield is changed +/-0.01.  The slope of the line is the duration.
     """
-    price = -1 * npf.pv(rate=yield_close, nper=num_payments, pmt=coupon, fv=fv)
+    price = -1 * npf.pv(rate=ytm, nper=num_payments, pmt=coupon, fv=fv)
     lower = -1 * npf.pv(
-        rate=yield_close - yield_change, nper=num_payments, pmt=coupon, fv=fv
+        rate=ytm - yield_change, nper=num_payments, pmt=coupon, fv=fv
     )
     higher = -1 * npf.pv(
-        rate=yield_close + yield_change, nper=num_payments, pmt=coupon, fv=fv
+        rate=ytm + yield_change, nper=num_payments, pmt=coupon, fv=fv
     )
     dv01 = (lower - higher) / (2 * price * yield_change)
     return dv01
@@ -56,7 +56,7 @@ def main():
     yield_df = pd.read_sql("tick_history", DATABASE_URL).set_index("id")
     coupon_df = pd.read_sql("cusip_info", DATABASE_URL).set_index("cusip")
 
-    yield_df["yield_close"] = yield_df["yield_close"] / 100
+    yield_df["ytm"] = yield_df["ytm"] / 100
 
     dv01_df = yield_df[["cusip", "trade_date"]].copy()
     dv01_df["dv01"] = np.nan
@@ -64,12 +64,12 @@ def main():
     # iterate through every row and calculate the dv01 for each
     for id_row in yield_df.index:
         cusip = yield_df.loc[id_row, "cusip"]
-        yield_close = yield_df.loc[id_row, "yield_close"]
+        ytm = yield_df.loc[id_row, "ytm"]
         trade_date = yield_df.loc[id_row, "trade_date"]
         coupon = coupon_df.loc[cusip, "coupon"]
         maturity_date = coupon_df.loc[cusip, "maturity_date"]
         num_payments = num_payments_left(trade_date, maturity_date)
-        dv01_df.loc[id_row, "dv01"] = calc_dv01(yield_close, coupon, num_payments)
+        dv01_df.loc[id_row, "dv01"] = calc_dv01(ytm, coupon, num_payments)
 
     dv01_df.to_sql("dv01_info", DATABASE_URL, if_exists="replace", index=True)
 

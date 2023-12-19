@@ -13,7 +13,7 @@ from scipy.stats import norm
 
 
 def create_portfolio(
-    input_df: pd.DataFrame, table_data: dict, column: str = "yield_close"
+    input_df: pd.DataFrame, table_data: dict, column: str = "ytm"
 ) -> pd.DataFrame:
     """convert yield or DV01 data into a columnar dataframe and use that to compute the historical portfolio values"""
 
@@ -37,7 +37,7 @@ def create_yield_change_df(
 ) -> pd.DataFrame:
     """compute the historical portfolio yield change"""
 
-    port_df = create_portfolio(yield_df, table_data, "yield_close")
+    port_df = create_portfolio(yield_df, table_data, "ytm")
     delta_df = port_df - port_df.shift(1)
 
     return delta_df
@@ -72,7 +72,7 @@ def check_weights(table_data: list[dict]) -> bool:
     return False
 
 
-def convert_to_port_df(port_data: str, column: str = "yield_close") -> pd.DataFrame:
+def convert_to_port_df(port_data: str, column: str = "ytm") -> pd.DataFrame:
     """converts json string to pandas dataframe"""
     port_df = pd.DataFrame(json.loads(port_data))
     port_df["trade_date"] = pd.to_datetime(port_df["trade_date"])

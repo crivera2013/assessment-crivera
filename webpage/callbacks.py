@@ -26,7 +26,7 @@ def get_callbacks(app):
     def query_yield_data(start_date: str, end_date: str, secs: list[str]) -> dict:
         """Callback function to query the SQL database for the yield data
         and return it as a json string"""
-        query = f"""select cusip, yield_close, trade_date from tick_history where
+        query = f"""select cusip, ytm, trade_date from tick_history where
         trade_date >= '{start_date}' and trade_date <= '{end_date}' and cusip in {tuple(secs)}"""
         yield_df = pd.read_sql(query, DATABASE_URL).to_dict("records")
 
@@ -79,7 +79,7 @@ def get_callbacks(app):
     )
     def create_yield_chart(port_data, table_data):
         sec_df = calcs.convert_to_port_df(port_data)
-        port_df = calcs.create_portfolio(sec_df, table_data, "yield_close")
+        port_df = calcs.create_portfolio(sec_df, table_data, "ytm")
         traces = []
         for sec in port_df.columns:
             traces.append(

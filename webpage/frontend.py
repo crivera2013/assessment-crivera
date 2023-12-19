@@ -104,7 +104,7 @@ def load_html() -> html.Div:
                             html.Label("Select Securities", style=styling),
                             dcc.Dropdown(
                                 options=CUSIPS,
-                                value=["00751YAD8", "90131HAY1", "912810FG8"],
+                                value=["00751YAD8", "90131HAY1", "912920AK1", "674599BM6"],
                                 multi=True,
                                 clearable=False,
                                 id="sec-picker",
@@ -142,7 +142,7 @@ def load_html() -> html.Div:
                                     "issuer",
                                     "coupon",
                                     "maturity_date",
-                                    "payments_per_year",
+                                    "coupon_freq",
                                 ]
                             ]
                         ),
